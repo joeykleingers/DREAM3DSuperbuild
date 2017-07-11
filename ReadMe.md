@@ -15,3 +15,17 @@ This project is in support of the [DREAM.3D data analysis project.](http://dream
 
 Other DREAM.3D plugins can be found at [http://www.github.com/dream3d](http://www.github.com/dream3d)
 
+## Making an SDK  ##
+
+### Windows ###
+
+For information on how to build a DREAM.3D SDK using the DREAM3D Superbuild on Windows, please visit [Making an SDK (Windows)](https://github.com/BlueQuartzSoftware/DREAM3D/wiki/Making-an-SDK-(Windows)).
+
+### Mac OS X ###
+
+For information on how to build a DREAM.3D SDK using the DREAM3D Superbuild on Mac OS X, please visit [Making an SDK (OS X)](https://github.com/BlueQuartzSoftware/DREAM3D/wiki/Making-an-SDK-(OS-X)).
+
+### Linux ###
+
+For information on how to build a DREAM.3D SDK using the DREAM3D Superbuild on Mac OS X, please visit [Making an SDK (Linux)](https://github.com/BlueQuartzSoftware/DREAM3D/wiki/Making-an-SDK-(Linux)).
+
