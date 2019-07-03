@@ -1,0 +1,87 @@
+set(extProjectName "libarchive")
+
+set(LIBARCHIVE_VERSION "3.3.3")
+message(STATUS "External Project: ${extProjectName}: ${LIBARCHIVE_VERSION}")
+
+set(LIBARCHIVE_URL "https://www.libarchive.org/downloads/libarchive-${LIBARCHIVE_VERSION}.tar.gz")
+
+if(WIN32)
+  set(LIBARCHIVE_INSTALL "${DREAM3D_SDK}/${extProjectName}-${LIBARCHIVE_VERSION}")
+else()
+  set(LIBARCHIVE_INSTALL "${DREAM3D_SDK}/${extProjectName}-${LIBARCHIVE_VERSION}-${CMAKE_BUILD_TYPE}")
+endif()
+
+if(LIBARCHIVE_STATIC_ZLIB)
+  if(WIN32)
+    list(APPEND LIBARCHIVE_FLAGS "-DZLIB_LIBRARY_DEBUG:FILEPATH=${ZLIB_INSTALL}/lib/zlibstaticd.lib")
+    list(APPEND LIBARCHIVE_FLAGS "-DZLIB_LIBRARY_RELEASE:FILEPATH=${ZLIB_INSTALL}/lib/zlibstatic.lib")
+  else()
+    list(APPEND LIBARCHIVE_FLAGS "-DZLIB_LIBRARY:FILEPATH=${ZLIB_INSTALL}/lib/libz.a")
+  endif()
+endif()
+
+set_property(DIRECTORY PROPERTY EP_BASE ${DREAM3D_SDK}/superbuild)
+
+set(LIBARCHIVE_SUFFIX "_d")
+
+if(WIN32)
+  set(CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP")
+  set(C_FLAGS "/DWIN32 /D_WINDOWS /W3 /MP")
+  set(C_CXX_FLAGS -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DCMAKE_C_FLAGS=${C_FLAGS})
+
+  set(WINDOWS_VERSION "WIN8")
+endif()
+
+ExternalProject_Add(${extProjectName}
+  DOWNLOAD_NAME ${extProjectName}-${LIBARCHIVE_VERSION}.tar.gz
+  URL ${LIBARCHIVE_URL}
+  TMP_DIR "${DREAM3D_SDK}/superbuild/${extProjectName}/tmp/${CMAKE_BUILD_TYPE}"
+  STAMP_DIR "${DREAM3D_SDK}/superbuild/${extProjectName}/Stamp/${CMAKE_BUILD_TYPE}"
+  DOWNLOAD_DIR "${DREAM3D_SDK}/superbuild/${extProjectName}"
+  SOURCE_DIR "${DREAM3D_SDK}/superbuild/${extProjectName}/Source/${extProjectName}"
+  BINARY_DIR "${DREAM3D_SDK}/superbuild/${extProjectName}/Build/${CMAKE_BUILD_TYPE}"
+  INSTALL_DIR "${LIBARCHIVE_INSTALL}"
+
+  CMAKE_ARGS
+    -DCMAKE_POLICY_DEFAULT_CMP0074=NEW
+    -DCMAKE_MODULE_PATH=${ZLIB_INSTALL}
+    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+    ${C_CXX_FLAGS}
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${OSX_DEPLOYMENT_TARGET}
+    -DCMAKE_OSX_SYSROOT=${OSX_SDK}
+    -DCMAKE_CXX_STANDARD=11
+    -DCMAKE_CXX_STANDARD_REQUIRED=ON
+    -DCMAKE_DEBUG_POSTFIX:STRING=${LIBARCHIVE_SUFFIX}
+    -DBUILD_TESTING:BOOL=OFF
+    -DWINDOWS_VERSION:STRING=${WINDOWS_VERSION}
+    -DENABLE_TEST:BOOL=OFF
+    -DENABLE_CAT:BOOL=OFF
+    -DENABLE_TAR:BOOL=OFF
+    -DENABLE_CPIO:BOOL=OFF
+    -DZLIB_ROOT=${ZLIB_INSTALL}
+    ${LIBARCHIVE_FLAGS}
+
+  LOG_DOWNLOAD 1
+  LOG_UPDATE 1
+  LOG_CONFIGURE 1
+  LOG_BUILD 1
+  LOG_TEST 1
+  LOG_INSTALL 1
+)
+
+#-- Append this information to the DREAM3D_SDK CMake file that helps other developers
+#-- configure NDE for building
+file(APPEND ${DREAM3D_SDK_FILE} "\n")
+file(APPEND ${DREAM3D_SDK_FILE} "#--------------------------------------------------------------------------------------------------\n")
+file(APPEND ${DREAM3D_SDK_FILE} "# libarchive Library Location\n")
+if(APPLE)
+  file(APPEND ${DREAM3D_SDK_FILE} "set(LIBARCHIVE_DIR \"\${DREAM3D_SDK_ROOT}/${extProjectName}-${LIBARCHIVE_VERSION}-\${BUILD_TYPE}\" CACHE PATH \"\")\n")
+elseif(WIN32)
+  file(APPEND ${DREAM3D_SDK_FILE} "set(LIBARCHIVE_DIR \"\${DREAM3D_SDK_ROOT}/${extProjectName}-${LIBARCHIVE_VERSION}\" CACHE PATH \"\")\n")
+else()
+  file(APPEND ${DREAM3D_SDK_FILE} "set(LIBARCHIVE_DIR \"\${DREAM3D_SDK_ROOT}/${extProjectName}-${LIBARCHIVE_VERSION}-\${BUILD_TYPE}\" CACHE PATH \"\")\n")
+endif()
+file(APPEND ${DREAM3D_SDK_FILE} "set(CMAKE_MODULE_PATH \${CMAKE_MODULE_PATH} \${LIBARCHIVE_DIR})\n")
+file(APPEND ${DREAM3D_SDK_FILE} "set(LIBARCHIVE_STATIC_ZLIB ${LIBARCHIVE_STATIC_ZLIB})\n")

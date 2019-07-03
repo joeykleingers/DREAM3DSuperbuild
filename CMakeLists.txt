@@ -141,6 +141,24 @@ include(HDF5)
 include(TBB)
 include(Haru)
 
+option(LIBARCHIVE_STATIC_ZLIB "Builds libarchive with static zlib" OFF)
+
+#--------------------------------------------------------------------------------------------------
+# Are we building ZLib (OFF by default)
+#--------------------------------------------------------------------------------------------------
+OPTION(BUILD_ZLIB "Build ZLib" OFF)
+if("${BUILD_ZLIB}" STREQUAL "ON")
+  include(ZLib)
+endif()
+
+#--------------------------------------------------------------------------------------------------
+# Are we building LibArchive (OFF by default)
+#--------------------------------------------------------------------------------------------------
+OPTION(BUILD_LIBARCHIVE "Build LibArchive" OFF)
+if("${BUILD_LIBARCHIVE}" STREQUAL "ON")
+  include(LibArchive)
+endif()
+
 #--------------------------------------------------------------------------------------------------
 # Are we building ITK (ON by default)
 #--------------------------------------------------------------------------------------------------
